@@ -710,9 +710,10 @@
             <div class="back-btn" id="backToHome4">←</div>
         </div>
         <div style="flex: 1; position: relative; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; flex-direction: column; justify-content: space-between; padding: 20px 0;">
-            <!-- 相机预览区域 -->
-            <div style="flex: 1; display: flex; align-items: center; justify-content: center;">
-                <div style="width: 200px; height: 200px; border: 3px dashed rgba(255,255,255,0.5); border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white;">
+            <!-- Camera Preview Area -->
+            <div style="flex: 1; display: flex; align-items: center; justify-content: center; position: relative;">
+                <video id="cameraPreview" autoplay playsinline muted style="max-width: 100%; max-height: 100%; border-radius: 20px; background: #000;"></video>
+                <div id="cameraPlaceholder" style="position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white;">
                     <div style="font-size: 48px; margin-bottom: 10px;">📷</div>
                     <div style="font-size: 16px;">Camera Preview</div>
                 </div>
@@ -1171,6 +1172,11 @@
                         }, 300);
                     }, 150);
                 }
+                if (appName === 'camera') {
+                    startCamera();
+                } else {
+                    stopCamera();
+                }
             });
             
             // 返回主页按钮
@@ -1179,6 +1185,7 @@
                 $('#appGrid').show();
                 $('.dock').show();
                 hideMobileKeyboard();
+                stopCamera();
             });
             
             // 聊天输入框点击显示键盘
@@ -1432,9 +1439,35 @@
                     input.val('');
                     hideMobileKeyboard();
                 }).catch((error) => {
-                    console.error('fail:', error);
+                    console.error('发送消息失败:', error);
                     
                 });
+            }
+        }
+
+        let cameraStream = null; // Store webcam stream
+        function startCamera() {
+            if (cameraStream) return; // already running
+            const video = document.getElementById('cameraPreview');
+            const placeholder = document.getElementById('cameraPlaceholder');
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                alert('Webcam is not supported in this browser.');
+                return;
+            }
+            navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
+                cameraStream = stream;
+                video.srcObject = stream;
+                placeholder.style.display = 'none';
+            }).catch(err => {
+                console.error('Failed to access camera', err);
+                alert('Unable to access the camera. Please allow camera permission.');
+            });
+        }
+        function stopCamera() {
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(t => t.stop());
+                cameraStream = null;
+                document.getElementById('cameraPlaceholder').style.display = 'flex';
             }
         }
     </script>
