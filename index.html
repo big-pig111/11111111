@@ -331,9 +331,9 @@
             overflow-y: auto;
             margin-bottom: 0;
             padding-bottom: 10px;
-            max-height: calc(100% - 140px);
-            scrollbar-width: thin;
-            scrollbar-color: rgba(255,255,255,0.3) transparent;
+            max-height: calc(100% - 100px); /* 增大可滚动区域 */
+            scrollbar-width: thick; /* 更宽的滚动条 */
+            scrollbar-color: rgba(120,120,120,0.6) #222;
         }
         
         .chat-messages::after {
@@ -343,7 +343,7 @@
         }
         
         .chat-messages::-webkit-scrollbar {
-            width: 6px;
+            width: 14px; /* 更宽的滚动条 */
         }
         
         .chat-messages::-webkit-scrollbar-track {
@@ -351,12 +351,12 @@
         }
         
         .chat-messages::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.3);
-            border-radius: 3px;
+            background: rgba(120,120,120,0.6);
+            border-radius: 8px;
         }
         
         .chat-messages::-webkit-scrollbar-thumb:hover {
-            background: rgba(255,255,255,0.5);
+            background: rgba(80,80,80,0.8);
         }
         
         .message {
@@ -642,7 +642,7 @@
         </div>
         <div class="chat-input">
             <div class="input-box">
-                <input type="text" id="chatInput" placeholder="输入消息...">
+                <input type="text" id="chatInput" placeholder="Type a message...">
             </div>
             <div class="send-btn" id="sendMessage">→</div>
             <div class="send-btn" id="debugKeyboard" style="background-color: #FF5722; margin-left: 5px;">⌨</div>
@@ -655,7 +655,7 @@
             <div class="back-btn" id="backToHome2">←</div>
         </div>
         <div style="flex: 1; background-color: #111; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 18px;">
-            这是一个模拟浏览器界面，实际项目中可嵌入网页内容
+            This is a simulated browser interface. You can embed real web content here in an actual project.
         </div>
     </div>
     
@@ -668,29 +668,29 @@
             <!-- 通话记录 -->
             <div style="background: #333; margin-bottom: 15px; border-radius: 15px; overflow: hidden;">
                 <div style="padding: 15px; background: #444;">
-                    <div style="color: #fff; font-size: 18px; font-weight: bold;">最近通话</div>
+                    <div style="color: #fff; font-size: 18px; font-weight: bold;">Recent Calls</div>
                 </div>
                 <div style="padding: 15px; display: flex; align-items: center; border-bottom: 1px solid #555;">
                     <div style="width: 45px; height: 45px; background: #4CAF50; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px; color: white; font-size: 18px;">👤</div>
                     <div style="flex: 1;">
-                        <div style="color: #fff; font-size: 16px; margin-bottom: 3px;">张三</div>
-                        <div style="color: #888; font-size: 12px;">今天 15:30</div>
+                        <div style="color: #fff; font-size: 16px; margin-bottom: 3px;">John</div>
+                        <div style="color: #888; font-size: 12px;">Today 15:30</div>
                     </div>
                     <div style="color: #4CAF50; font-size: 20px;">📞</div>
                 </div>
                 <div style="padding: 15px; display: flex; align-items: center; border-bottom: 1px solid #555;">
                     <div style="width: 45px; height: 45px; background: #2196F3; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px; color: white; font-size: 18px;">👤</div>
                     <div style="flex: 1;">
-                        <div style="color: #fff; font-size: 16px; margin-bottom: 3px;">李四</div>
-                        <div style="color: #888; font-size: 12px;">昨天 20:15</div>
+                        <div style="color: #fff; font-size: 16px; margin-bottom: 3px;">Jane</div>
+                        <div style="color: #888; font-size: 12px;">Yesterday 20:15</div>
                     </div>
                     <div style="color: #f44336; font-size: 20px;">📞</div>
                 </div>
                 <div style="padding: 15px; display: flex; align-items: center;">
                     <div style="width: 45px; height: 45px; background: #FF9800; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px; color: white; font-size: 18px;">👤</div>
                     <div style="flex: 1;">
-                        <div style="color: #fff; font-size: 16px; margin-bottom: 3px;">王五</div>
-                        <div style="color: #888; font-size: 12px;">1月18日 14:20</div>
+                        <div style="color: #fff; font-size: 16px; margin-bottom: 3px;">Alex</div>
+                        <div style="color: #888; font-size: 12px;">Jan 18 14:20</div>
                     </div>
                     <div style="color: #4CAF50; font-size: 20px;">📞</div>
                 </div>
@@ -699,7 +699,7 @@
             <!-- 拨号按钮 -->
             <div style="text-align: center;">
                 <div style="width: 60px; height: 60px; background: #4CAF50; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; color: white; font-size: 24px; box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);">📞</div>
-                <div style="color: #888; font-size: 14px; margin-top: 8px;">拨号</div>
+                <div style="color: #888; font-size: 14px; margin-top: 8px;">Dial</div>
             </div>
         </div>
     </div>
@@ -714,7 +714,7 @@
             <div style="flex: 1; display: flex; align-items: center; justify-content: center;">
                 <div style="width: 200px; height: 200px; border: 3px dashed rgba(255,255,255,0.5); border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white;">
                     <div style="font-size: 48px; margin-bottom: 10px;">📷</div>
-                    <div style="font-size: 16px;">相机预览</div>
+                    <div style="font-size: 16px;">Camera Preview</div>
                 </div>
             </div>
             
@@ -738,7 +738,7 @@
                     <div style="width: 40px; height: 40px; background: #4CAF50; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px; color: white; font-size: 18px;">👤</div>
                     <div style="flex: 1;">
                         <div style="color: #fff; font-size: 16px; margin-bottom: 3px;">Apple ID</div>
-                        <div style="color: #888; font-size: 14px;">用户账户设置</div>
+                        <div style="color: #888; font-size: 14px;">User Account Settings</div>
                     </div>
                     <div style="color: #888; font-size: 18px;">›</div>
                 </div>
@@ -748,28 +748,28 @@
                 <div style="padding: 15px; display: flex; align-items: center; border-bottom: 1px solid #555;">
                     <div style="width: 40px; height: 40px; background: #2196F3; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-right: 15px; color: white; font-size: 18px;">📶</div>
                     <div style="flex: 1;">
-                        <div style="color: #fff; font-size: 16px;">蜂窝网络</div>
+                        <div style="color: #fff; font-size: 16px;">Cellular</div>
                     </div>
                     <div style="color: #888; font-size: 18px;">›</div>
                 </div>
                 <div style="padding: 15px; display: flex; align-items: center; border-bottom: 1px solid #555;">
                     <div style="width: 40px; height: 40px; background: #9C27B0; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-right: 15px; color: white; font-size: 18px;">📱</div>
                     <div style="flex: 1;">
-                        <div style="color: #fff; font-size: 16px;">显示与亮度</div>
+                        <div style="color: #fff; font-size: 16px;">Display & Brightness</div>
                     </div>
                     <div style="color: #888; font-size: 18px;">›</div>
                 </div>
                 <div style="padding: 15px; display: flex; align-items: center; border-bottom: 1px solid #555;">
                     <div style="width: 40px; height: 40px; background: #FF5722; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-right: 15px; color: white; font-size: 18px;">🔊</div>
                     <div style="flex: 1;">
-                        <div style="color: #fff; font-size: 16px;">声音与触感</div>
+                        <div style="color: #fff; font-size: 16px;">Sound & Haptics</div>
                     </div>
                     <div style="color: #888; font-size: 18px;">›</div>
                 </div>
                 <div style="padding: 15px; display: flex; align-items: center;">
                     <div style="width: 40px; height: 40px; background: #607D8B; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-right: 15px; color: white; font-size: 18px;">🔒</div>
                     <div style="flex: 1;">
-                        <div style="color: #fff; font-size: 16px;">隐私与安全</div>
+                        <div style="color: #fff; font-size: 16px;">Privacy & Security</div>
                     </div>
                     <div style="color: #888; font-size: 18px;">›</div>
                 </div>
@@ -779,7 +779,7 @@
                 <div style="padding: 15px; display: flex; align-items: center;">
                     <div style="width: 40px; height: 40px; background: #795548; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-right: 15px; color: white; font-size: 18px;">ℹ️</div>
                     <div style="flex: 1;">
-                        <div style="color: #fff; font-size: 16px;">关于本机</div>
+                        <div style="color: #fff; font-size: 16px;">About</div>
                     </div>
                     <div style="color: #888; font-size: 18px;">›</div>
                 </div>
@@ -789,27 +789,27 @@
     
     <div class="app-content" id="galleryApp">
         <div class="app-header">
-            <div class="app-title">相册</div>
+            <div class="app-title">Gallery</div>
             <div class="back-btn" id="backToHome6">←</div>
         </div>
         <div style="flex: 1; padding: 10px 0;">
             <!-- 相册统计 -->
             <div style="text-align: center; margin-bottom: 20px;">
-                <div style="color: #fff; font-size: 24px; margin-bottom: 5px;">126 张照片</div>
-                <div style="color: #888; font-size: 14px;">最近添加于今天</div>
+                <div style="color: #fff; font-size: 24px; margin-bottom: 5px;">126 Photos</div>
+                <div style="color: #888; font-size: 14px;">Recently added today</div>
             </div>
             
             <!-- 相册分类 -->
             <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px;">
                 <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; padding: 20px; text-align: center;">
                     <div style="font-size: 32px; margin-bottom: 8px;">📸</div>
-                    <div style="color: white; font-size: 16px; font-weight: bold;">最近项目</div>
-                    <div style="color: rgba(255,255,255,0.8); font-size: 12px;">28 张</div>
+                    <div style="color: white; font-size: 16px; font-weight: bold;">Recents</div>
+                    <div style="color: rgba(255,255,255,0.8); font-size: 12px;">28 items</div>
                 </div>
                 <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 15px; padding: 20px; text-align: center;">
                     <div style="font-size: 32px; margin-bottom: 8px;">❤️</div>
-                    <div style="color: white; font-size: 16px; font-weight: bold;">个人收藏</div>
-                    <div style="color: rgba(255,255,255,0.8); font-size: 12px;">12 张</div>
+                    <div style="color: white; font-size: 16px; font-weight: bold;">Favorites</div>
+                    <div style="color: rgba(255,255,255,0.8); font-size: 12px;">12 items</div>
                 </div>
             </div>
             
@@ -827,7 +827,7 @@
     
     <div class="app-content" id="musicApp">
         <div class="app-header">
-            <div class="app-title">音乐</div>
+            <div class="app-title">Music</div>
             <div class="back-btn" id="backToHome7">←</div>
         </div>
         <div style="flex: 1; display: flex; flex-direction: column; padding: 20px 0;">
@@ -860,15 +860,15 @@
             <div style="display: flex; justify-content: space-around; margin-top: auto; padding: 20px 0;">
                 <div style="text-align: center; cursor: pointer;">
                     <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 5px auto; color: white; font-size: 18px;">🔀</div>
-                    <div style="color: #888; font-size: 10px;">随机</div>
+                    <div style="color: #888; font-size: 10px;">Random</div>
                 </div>
                 <div style="text-align: center; cursor: pointer;">
                     <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 5px auto; color: white; font-size: 18px;">🔁</div>
-                    <div style="color: #888; font-size: 10px;">循环</div>
+                    <div style="color: #888; font-size: 10px;">Loop</div>
                 </div>
                 <div style="text-align: center; cursor: pointer;">
                     <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 5px auto; color: white; font-size: 18px;">📝</div>
-                    <div style="color: #888; font-size: 10px;">歌词</div>
+                    <div style="color: #888; font-size: 10px;">Lyrics</div>
                 </div>
             </div>
         </div>
@@ -876,7 +876,7 @@
     
     <div class="app-content" id="calendarApp">
         <div class="app-header">
-            <div class="app-title">日历</div>
+            <div class="app-title">Calendar</div>
             <div class="back-btn" id="backToHome8">←</div>
         </div>
         <div style="flex: 1; padding: 15px 0;">
@@ -884,8 +884,8 @@
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding: 0 10px;">
                 <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; font-size: 18px;">‹</div>
                 <div style="text-align: center;">
-                    <div style="color: #fff; font-size: 24px; font-weight: bold;">2025年1月</div>
-                    <div style="color: #888; font-size: 14px;">今天是20日星期一</div>
+                    <div style="color: #fff; font-size: 24px; font-weight: bold;">January 2025</div>
+                    <div style="color: #888; font-size: 14px;">Today is Monday 20</div>
                 </div>
                 <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; font-size: 18px;">›</div>
             </div>
@@ -894,13 +894,13 @@
             <div style="background: #333; border-radius: 15px; padding: 15px; margin-bottom: 20px;">
                 <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; text-align: center;">
                     <!-- 星期标题 -->
-                    <div style="color: #f44336; font-size: 12px; font-weight: bold; padding: 8px;">日</div>
-                    <div style="color: #888; font-size: 12px; font-weight: bold; padding: 8px;">一</div>
-                    <div style="color: #888; font-size: 12px; font-weight: bold; padding: 8px;">二</div>
-                    <div style="color: #888; font-size: 12px; font-weight: bold; padding: 8px;">三</div>
-                    <div style="color: #888; font-size: 12px; font-weight: bold; padding: 8px;">四</div>
-                    <div style="color: #888; font-size: 12px; font-weight: bold; padding: 8px;">五</div>
-                    <div style="color: #2196F3; font-size: 12px; font-weight: bold; padding: 8px;">六</div>
+                    <div style="color: #f44336; font-size: 12px; font-weight: bold; padding: 8px;">Sun</div>
+                    <div style="color: #888; font-size: 12px; font-weight: bold; padding: 8px;">Mon</div>
+                    <div style="color: #888; font-size: 12px; font-weight: bold; padding: 8px;">Tue</div>
+                    <div style="color: #888; font-size: 12px; font-weight: bold; padding: 8px;">Wed</div>
+                    <div style="color: #888; font-size: 12px; font-weight: bold; padding: 8px;">Thu</div>
+                    <div style="color: #888; font-size: 12px; font-weight: bold; padding: 8px;">Fri</div>
+                    <div style="color: #2196F3; font-size: 12px; font-weight: bold; padding: 8px;">Sat</div>
                     
                     <!-- 日期 -->
                     <div style="padding: 12px 8px; font-size: 14px; color: #888;">29</div>
@@ -936,18 +936,18 @@
             
             <!-- 今日事件 -->
             <div style="background: #333; border-radius: 15px; padding: 15px;">
-                <div style="color: #fff; font-size: 16px; font-weight: bold; margin-bottom: 15px;">今日事件</div>
+                <div style="color: #fff; font-size: 16px; font-weight: bold; margin-bottom: 15px;">Today's Events</div>
                 <div style="display: flex; align-items: center; margin-bottom: 12px;">
                     <div style="width: 8px; height: 8px; background: #4CAF50; border-radius: 50%; margin-right: 12px;"></div>
                     <div style="flex: 1;">
-                        <div style="color: #fff; font-size: 14px;">工作会议</div>
+                        <div style="color: #fff; font-size: 14px;">Work Meeting</div>
                         <div style="color: #888; font-size: 12px;">09:00 - 10:30</div>
                     </div>
                 </div>
                 <div style="display: flex; align-items: center;">
                     <div style="width: 8px; height: 8px; background: #2196F3; border-radius: 50%; margin-right: 12px;"></div>
                     <div style="flex: 1;">
-                        <div style="color: #fff; font-size: 14px;">午餐约会</div>
+                        <div style="color: #fff; font-size: 14px;">Lunch Date</div>
                         <div style="color: #888; font-size: 12px;">12:00 - 13:30</div>
                     </div>
                 </div>
@@ -957,7 +957,7 @@
     
     <div class="app-content" id="clockApp">
         <div class="app-header">
-            <div class="app-title">时钟</div>
+            <div class="app-title">Clock</div>
             <div class="back-btn" id="backToHome9">←</div>
         </div>
         <div style="flex: 1; display: flex; flex-direction: column; padding: 20px 0;">
@@ -976,21 +976,21 @@
                     <!-- 中心点 -->
                     <div style="position: absolute; width: 12px; height: 12px; background: #4CAF50; border-radius: 50%; top: 50%; left: 50%; transform: translate(-50%, -50%);"></div>
                 </div>
-                <div style="color: #888; font-size: 18px; margin-bottom: 5px;">北京时间</div>
-                <div style="color: #666; font-size: 14px;" id="currentDate">2025年1月20日 星期一</div>
+                <div style="color: #888; font-size: 18px; margin-bottom: 5px;">Beijing Time</div>
+                <div style="color: #666; font-size: 14px;" id="currentDate">January 20, 2025 Monday</div>
             </div>
             
             <!-- 世界时钟 -->
             <div style="background: #333; border-radius: 15px; padding: 15px; margin-bottom: 20px;">
-                <div style="color: #fff; font-size: 16px; font-weight: bold; margin-bottom: 15px;">世界时钟</div>
+                <div style="color: #fff; font-size: 16px; font-weight: bold; margin-bottom: 15px;">World Clock</div>
                 <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
                     <div style="text-align: center; padding: 15px; background: #444; border-radius: 10px;">
-                        <div style="color: #888; font-size: 12px; margin-bottom: 5px;">纽约</div>
+                        <div style="color: #888; font-size: 12px; margin-bottom: 5px;">New York</div>
                         <div style="color: #fff; font-size: 18px; font-weight: bold;">23:00</div>
-                        <div style="color: #666; font-size: 10px;">-13小时</div>
+                        <div style="color: #666; font-size: 10px;">-13h</div>
                     </div>
                     <div style="text-align: center; padding: 15px; background: #444; border-radius: 10px;">
-                        <div style="color: #888; font-size: 12px; margin-bottom: 5px;">伦敦</div>
+                        <div style="color: #888; font-size: 12px; margin-bottom: 5px;">London</div>
                         <div style="color: #fff; font-size: 18px; font-weight: bold;">04:00</div>
                         <div style="color: #666; font-size: 10px;">-8小时</div>
                     </div>
@@ -1165,7 +1165,11 @@
                 // 滚动到消息底部（消息应用）
                 if (appName === 'message') {
                     const messages = $('#chatMessages');
-                    messages.scrollTop(messages[0].scrollHeight);
+                    setTimeout(() => {
+                        messages.animate({
+                            scrollTop: messages[0].scrollHeight
+                        }, 300);
+                    }, 150);
                 }
             });
             
@@ -1315,9 +1319,9 @@
                 const year = now.getFullYear();
                 const month = now.getMonth() + 1;
                 const day = now.getDate();
-                const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+                const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
                 const weekday = weekdays[now.getDay()];
-                $('#currentDate').text(`${year}年${month}月${day}日 ${weekday}`);
+                $('#currentDate').text(`${month}/${day}/${year} ${weekday}`);
                 
                 // 状态栏时间已移除
             }
@@ -1370,6 +1374,13 @@
             const messageClass = isCurrentUser ? 'user' : 'friend';
             const backgroundColor = isCurrentUser ? '#4CAF50' : messageData.userColor || '#555';
             
+            // 强制将所有已知中文用户名转为英文
+            if (messageData.userName === '我') messageData.userName = 'Me';
+            if (messageData.userName === '系统') messageData.userName = 'System';
+            if (messageData.userName === '朋友1') messageData.userName = 'Friend 1';
+            if (messageData.userName === '朋友2') messageData.userName = 'Friend 2';
+            if (/^用户/.test(messageData.userName)) messageData.userName = messageData.userName.replace(/^用户/, 'User');
+            
             const messageElement = `
                 <div style="clear: both; margin-bottom: 5px;">
                     <div class="message ${messageClass}" style="background-color: ${backgroundColor};">
@@ -1399,11 +1410,18 @@
                 const h = now.getHours().toString().padStart(2, '0');
                 const m = now.getMinutes().toString().padStart(2, '0');
                 
+                // 始终用英文用户名
+                let displayName = localStorage.getItem('userDisplayName');
+                if (!displayName) {
+                    displayName = `User${userId.slice(-4)}`;
+                    localStorage.setItem('userDisplayName', displayName);
+                }
+                
                 // 创建消息对象
                 const messageData = {
                     text: message,
                     userId: userId,
-                    userName: `User${userId.slice(-4)}`,
+                    userName: displayName,
                     userColor: userColor,
                     time: `${h}:${m}`,
                     timestamp: firebase.database.ServerValue.TIMESTAMP
@@ -1414,8 +1432,8 @@
                     input.val('');
                     hideMobileKeyboard();
                 }).catch((error) => {
-                    console.error('发送消息失败:', error);
-                    alert('发送消息失败，请检查网络连接');
+                    console.error('fail:', error);
+                    
                 });
             }
         }
