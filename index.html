@@ -521,6 +521,20 @@
         @media (max-width: 1100px) {
             .side-image { display: none; }
         }
+        /* Browser full-screen iframe */
+        #browserApp {
+            padding: 0 !important;
+        }
+        #browserApp .app-header {
+            display: none;
+        }
+        #browserApp iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
     </style>
 </head>
 <body>
@@ -654,8 +668,8 @@
             <div class="app-title">Browser</div>
             <div class="back-btn" id="backToHome2">←</div>
         </div>
-        <div style="flex: 1; background-color: #111; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 18px;">
-            This is a simulated browser interface. You can embed real web content here in an actual project.
+        <div style="flex: 1; overflow:hidden;">
+            <iframe src="https://trumpmobile.com/" style="width:100%; height:100%; border:none;"></iframe>
         </div>
     </div>
     
@@ -1341,23 +1355,7 @@
         // 初始化聊天功能
         function initializeChat() {
             // 添加一些示例消息用于展示滚动功能
-            const sampleMessages = [
-                { text: "Welcome to Trump Mobile Chat!", userId: "system", userName: "System", userColor: "#2196F3", time: "09:00" },
-                { text: "This is a fully functional chat interface", userId: "friend1", userName: "Friend 1", userColor: "#4CAF50", time: "09:01" },
-                { text: "Supports real-time message sync", userId: "friend2", userName: "Friend 2", userColor: "#FF9800", time: "09:02" },
-                { text: "Hello! Nice to meet you", userId: userId, userName: "Me", userColor: userColor, time: "09:03" },
-                { text: "This chat UI is awesome!", userId: "friend1", userName: "Friend 1", userColor: "#4CAF50", time: "09:04" },
-                { text: "Yes, and it even has a virtual keyboard", userId: "friend2", userName: "Friend 2", userColor: "#FF9800", time: "09:05" },
-                { text: "Try scrolling to see more messages", userId: "friend1", userName: "Friend 1", userColor: "#4CAF50", time: "09:06" },
-                { text: "The keyboard works smoothly too", userId: userId, userName: "Me", userColor: userColor, time: "09:07" },
-                { text: "Here is another test message", userId: "friend2", userName: "Friend 2", userColor: "#FF9800", time: "09:08" },
-                { text: "Chat supports scrolling", userId: "friend1", userName: "Friend 1", userColor: "#4CAF50", time: "09:09" },
-                { text: "Great user experience!", userId: userId, userName: "Me", userColor: userColor, time: "09:10" },
-                { text: "Add more messages to test scrolling", userId: "friend2", userName: "Friend 2", userColor: "#FF9800", time: "09:11" },
-                { text: "You can see message history", userId: "friend1", userName: "Friend 1", userColor: "#4CAF50", time: "09:12" },
-                { text: "Scrollbar style is beautiful too", userId: userId, userName: "Me", userColor: userColor, time: "09:13" },
-                { text: "This is the last sample message", userId: "friend2", userName: "Friend 2", userColor: "#FF9800", time: "09:14" }
-            ];
+            const sampleMessages = [];
             
             // 显示示例消息
             sampleMessages.forEach(messageData => {
