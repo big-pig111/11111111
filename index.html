@@ -5,22 +5,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>网页手机模拟器</title>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <style>
+        * {
+            box-sizing: border-box;
+        }
+        
         body {
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+            position: fixed;
+        }
+        
+        .app-wrapper {
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            background-color: #f0f0f0;
-            font-family: 'Arial', sans-serif;
+            height: 100vh;
+            width: 100%;
+            padding: 10px;
+            overflow: hidden;
+            position: relative;
+            z-index: 2;
         }
         
         .phone-container {
             position: relative;
-            width: 390px;
-            height: 820px;
+            width: 420px;
+            height: 900px;
             background: #222;
-            border-radius: 36px;
+            border-radius: 40px;
             box-shadow: 0 8px 32px 0 rgba(0,0,0,0.18);
             display: flex;
             flex-direction: column;
@@ -29,18 +50,18 @@
         }
         
         .phone-top {
-            width: 180px;
-            height: 12px;
+            width: 200px;
+            height: 14px;
             background-color: #222;
-            border-radius: 6px;
-            margin-bottom: 12px;
+            border-radius: 7px;
+            margin-bottom: 15px;
         }
         
         .phone-bezel {
-            width: 97%;
-            height: 97%;
+            width: 96%;
+            height: 96%;
             background: #181818;
-            border-radius: 20px;
+            border-radius: 24px;
             overflow: hidden;
             border: 4px solid #111;
             display: flex;
@@ -51,8 +72,8 @@
         }
         
         .phone-screen {
-            width: 110%;
-            height: 110%;
+            width: 100%;
+            height: 100%;
             background: url('1.jpg') center center/cover no-repeat;
             border-radius: 20px;
             position: relative;
@@ -90,12 +111,14 @@
         
         .app-grid {
             width: 100%;
-            height: calc(100% - 36px);
-            padding: 14px 8px 8px 8px;
+            height: calc(100% - 100px);
+            padding: 20px 16px 8px 16px;
             box-sizing: border-box;
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
+            grid-template-rows: repeat(3, 1fr);
+            gap: 16px;
+            align-content: start;
         }
         
         .app-icon {
@@ -104,6 +127,7 @@
             align-items: center;
             cursor: pointer;
             transition: transform 0.2s;
+            justify-self: center;
         }
         
         .app-icon:hover {
@@ -111,66 +135,156 @@
         }
         
         .icon {
-            width: 56px;
-            height: 56px;
-            border-radius: 16px;
+            width: 60px;
+            height: 60px;
+            border-radius: 18px;
             background-color: #444;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 5px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            margin-bottom: 6px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
         }
         
         .icon img {
-            width: 34px;
-            height: 34px;
+            width: 36px;
+            height: 36px;
         }
         
         .icon-text {
-            font-size: 10px;
+            font-size: 11px;
             color: #fff;
             text-align: center;
+            font-weight: 500;
         }
         
-        .keyboard {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 200px;
-            background-color: #333;
-            display: none;
-            flex-direction: column;
-            padding: 10px;
-            box-sizing: border-box;
-            z-index: 10;
-        }
+        /* 特定应用图标的布局位置 */
+        .app-icon[data-app="message"] { grid-column: 1; grid-row: 1; }
+        .app-icon[data-app="browser"] { grid-column: 2; grid-row: 1; }
+        .app-icon[data-app="camera"] { grid-column: 3; grid-row: 1; }
+        .app-icon[data-app="settings"] { grid-column: 4; grid-row: 1; }
+        .app-icon[data-app="gallery"] { grid-column: 1; grid-row: 2; }
+        .app-icon[data-app="music"] { grid-column: 2; grid-row: 2; }
+        .app-icon[data-app="calendar"] { grid-column: 3; grid-row: 2; }
+        .app-icon[data-app="clock"] { grid-column: 4; grid-row: 2; }
         
-        .key-row {
+        /* 底部dock区域 */
+        .dock {
+            position: absolute;
+            bottom: 12px;
+            left: 12px;
+            right: 12px;
+            height: 85px;
+            background-color: rgba(40, 40, 40, 0.9);
+            border-radius: 28px;
             display: flex;
-            justify-content: space-between;
-            margin-bottom: 5px;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+            padding: 0 24px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
         }
         
-        .key {
-            flex: 1;
-            height: 40px;
+        .dock .app-icon {
+            margin: 0;
+        }
+        
+        .dock .icon {
+            width: 55px;
+            height: 55px;
+            border-radius: 16px;
             background-color: #555;
-            border-radius: 5px;
+            margin-bottom: 4px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+        }
+        
+        .dock .icon-text {
+            font-size: 10px;
+        }
+        
+
+        
+        /* 手机键盘样式 */
+        #phoneKeyboard.show {
+            animation: slideUpKeyboard 0.3s ease-out;
+        }
+        
+        @keyframes slideUpKeyboard {
+            from {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .mobile-key-row {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+        
+        .mobile-key {
+            flex: 1;
+            height: 42px;
+            max-width: 32px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: #fff;
-            font-size: 18px;
+            font-size: 16px;
+            font-weight: 500;
             cursor: pointer;
-            margin: 0 3px;
-            box-shadow: 0 2px 3px rgba(0, 0, 0, 0.3);
+            transition: all 0.15s ease;
+            user-select: none;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
         
-        .key.wide {
-            flex: 2;
+        .mobile-key:active,
+        .mobile-key.pressed {
+            transform: scale(0.95);
+            background: rgba(76, 175, 80, 0.8);
+            border-color: #4CAF50;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
         }
+        
+        .mobile-key-space {
+            flex: 3;
+            max-width: 120px;
+            font-size: 14px;
+        }
+        
+        .mobile-key-special {
+            background: rgba(74, 144, 226, 0.3);
+            border-color: rgba(74, 144, 226, 0.5);
+            font-size: 18px;
+        }
+        
+        .mobile-key-function {
+            background: rgba(158, 158, 158, 0.3);
+            border-color: rgba(158, 158, 158, 0.5);
+            font-size: 12px;
+        }
+        
+        .mobile-key-special:active,
+        .mobile-key-special.pressed {
+            background: rgba(74, 144, 226, 0.8);
+        }
+        
+        .mobile-key-function:active,
+        .mobile-key-function.pressed {
+            background: rgba(158, 158, 158, 0.8);
+        }
+        
+
         
         .app-content {
             position: absolute;
@@ -181,9 +295,11 @@
             background-color: #000;
             display: none;
             flex-direction: column;
-            padding: 10px 6px 6px 6px;
+            padding: 60px 15px 12px 15px;
             box-sizing: border-box;
             color: #fff;
+            border-radius: 0 0 20px 20px;
+            z-index: 25;
         }
         
         .app-header {
@@ -191,6 +307,7 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
+            margin-left: 8px;
         }
         
         .app-title {
@@ -212,7 +329,34 @@
         .chat-messages {
             flex: 1;
             overflow-y: auto;
-            margin-bottom: 20px;
+            margin-bottom: 0;
+            padding-bottom: 10px;
+            max-height: calc(100% - 140px);
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255,255,255,0.3) transparent;
+        }
+        
+        .chat-messages::after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+        
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .chat-messages::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.3);
+            border-radius: 3px;
+        }
+        
+        .chat-messages::-webkit-scrollbar-thumb:hover {
+            background: rgba(255,255,255,0.5);
         }
         
         .message {
@@ -221,18 +365,22 @@
             border-radius: 20px;
             margin-bottom: 10px;
             position: relative;
+            clear: both;
+            word-wrap: break-word;
         }
         
         .message.user {
             background-color: #4CAF50;
-            align-self: flex-end;
+            float: right;
             border-bottom-right-radius: 5px;
+            margin-left: auto;
         }
         
         .message.friend {
             background-color: #555;
-            align-self: flex-start;
+            float: left;
             border-bottom-left-radius: 5px;
+            margin-right: auto;
         }
         
         .message-time {
@@ -249,8 +397,15 @@
         }
         
         .chat-input {
+            position: absolute;
+            bottom: 12px;
+            left: 15px;
+            right: 15px;
             display: flex;
             gap: 10px;
+            background-color: #000;
+            padding: 10px 0;
+            z-index: 10;
         }
         
         .input-box {
@@ -337,10 +492,41 @@
             display: block;
             margin: 48px auto 0 auto;
         }
+        /* 新增：左右大图容器样式 */
+        .side-image {
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            width: 340px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+            pointer-events: none;
+        }
+        .side-image.left {
+            left: 0;
+        }
+        .side-image.right {
+            right: 0;
+        }
+        .side-image img {
+            max-height: 90vh;
+            max-width: 100%;
+            object-fit: contain;
+            opacity: 0.98;
+        }
+        @media (max-width: 1100px) {
+            .side-image { display: none; }
+        }
     </style>
 </head>
 <body>
-    <div class="phone-container">
+    <!-- 新增：左右两侧大图 -->
+    <div class="side-image left"><img src="11.png" alt="left"></div>
+    <div class="side-image right"><img src="22.png" alt="right"></div>
+    <div class="app-wrapper">
+        <div class="phone-container">
         <div class="phone-top"></div>
         <div class="phone-bezel">
             <div class="phone-screen" id="phoneScreen">
@@ -356,7 +542,7 @@
                     <div class="lock-unlock-tip">点击解锁</div>
                 </div>
                 <div class="status-bar">
-                    <div>10:30</div>
+                    <div></div>
                     <div class="battery">
                         <div class="battery-level"></div>
                     </div>
@@ -411,81 +597,53 @@
                         <div class="icon-text">时钟</div>
                     </div>
                 </div>
-            </div>
-        </div>
-        <div class="phone-bottom" style="width: 180px; height: 18px; background-color: #222; border-radius: 18px; margin-top: 18px;"></div>
-    </div>
-    
-    <div class="keyboard" id="keyboard">
-        <div class="key-row">
-            <div class="key">q</div>
-            <div class="key">w</div>
-            <div class="key">e</div>
-            <div class="key">r</div>
-            <div class="key">t</div>
-            <div class="key">y</div>
-            <div class="key">u</div>
-            <div class="key">i</div>
-            <div class="key">o</div>
-            <div class="key">p</div>
-        </div>
-        <div class="key-row">
-            <div class="key wide">abc</div>
-            <div class="key">a</div>
-            <div class="key">s</div>
-            <div class="key">d</div>
-            <div class="key">f</div>
-            <div class="key">g</div>
-            <div class="key">h</div>
-            <div class="key">j</div>
-            <div class="key">k</div>
-            <div class="key">l</div>
-            <div class="key">:</div>
-        </div>
-        <div class="key-row">
-            <div class="key wide">123</div>
-            <div class="key">z</div>
-            <div class="key">x</div>
-            <div class="key">c</div>
-            <div class="key">v</div>
-            <div class="key">b</div>
-            <div class="key">n</div>
-            <div class="key">m</div>
-            <div class="key">,</div>
-            <div class="key">.</div>
-            <div class="key">←</div>
-        </div>
-        <div class="key-row">
-            <div class="key wide" id="spaceKey"> </div>
-            <div class="key" id="enterKey">↵</div>
-        </div>
-    </div>
-    
-    <div class="app-content" id="messageApp">
+                
+                <!-- 底部dock区域 -->
+                <div class="dock">
+                    <div class="app-icon" data-app="phone">
+                        <div class="icon">
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 24 24' fill='%23fff'%3E%3Cpath d='M20.01 15.38c-1.23 0-2.42-.2-3.53-.56-.35-.12-.74-.03-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z'/%3E%3C/svg%3E" alt="电话图标">
+                        </div>
+                        <div class="icon-text">电话</div>
+                    </div>
+                    <div class="app-icon" data-app="message">
+                        <div class="icon">
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 24 24' fill='%23fff'%3E%3Cpath d='M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V8h16v10z'/%3E%3C/svg%3E" alt="消息图标">
+                        </div>
+                        <div class="icon-text">消息</div>
+                    </div>
+                    <div class="app-icon" data-app="browser">
+                        <div class="icon">
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 24 24' fill='%23fff'%3E%3Cpath d='M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V8h16v10z'/%3E%3Cpath d='M12 17.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5zm0-3.5c-.55 0-1 .45-1 1s.45 1 1 1 1-.45 1-1-.45-1-1-1z'/%3E%3C/svg%3E" alt="浏览器图标">
+                        </div>
+                        <div class="icon-text">浏览器</div>
+                    </div>
+                    <div class="app-icon" data-app="music">
+                        <div class="icon">
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 24 24' fill='%23fff'%3E%3Cpath d='M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z'/%3E%3C/svg%3E" alt="音乐图标">
+                        </div>
+                        <div class="icon-text">音乐</div>
+                    </div>
+                </div>
+                
+
+                
+                <!-- 应用内容区域 -->
+                <div class="app-content" id="messageApp">
         <div class="app-header">
             <div class="app-title">消息</div>
             <div class="back-btn" id="backToHome">←</div>
         </div>
-        <div class="chat-messages" id="chatMessages">
-            <div class="message friend">
-                <div class="message-time">10:20</div>
-                <div class="message-user">张三</div>
-                <div>你好，今天晚上一起吃饭吗？</div>
-            </div>
-            <div class="message friend">
-                <div class="message-time">10:22</div>
-                <div>我发现一家新开的餐厅，评价很不错。</div>
-            </div>
-            <div class="message user">
-                <div class="message-time">10:25</div>
-                <div>好啊，在哪里？</div>
-            </div>
+        <div class="chat-messages" id="chatMessages" style="padding-bottom: 80px;">
+            <!-- 消息将从Firebase实时加载 -->
+
         </div>
         <div class="chat-input">
             <div class="input-box">
                 <input type="text" id="chatInput" placeholder="输入消息...">
             </div>
             <div class="send-btn" id="sendMessage">→</div>
+            <div class="send-btn" id="debugKeyboard" style="background-color: #FF5722; margin-left: 5px;">⌨</div>
         </div>
     </div>
     
@@ -498,12 +656,506 @@
             这是一个模拟浏览器界面，实际项目中可嵌入网页内容
         </div>
     </div>
+    
+    <div class="app-content" id="phoneApp">
+        <div class="app-header">
+            <div class="app-title">电话</div>
+            <div class="back-btn" id="backToHome3">←</div>
+        </div>
+        <div style="flex: 1; padding: 10px 0;">
+            <!-- 通话记录 -->
+            <div style="background: #333; margin-bottom: 15px; border-radius: 15px; overflow: hidden;">
+                <div style="padding: 15px; background: #444;">
+                    <div style="color: #fff; font-size: 18px; font-weight: bold;">最近通话</div>
+                </div>
+                <div style="padding: 15px; display: flex; align-items: center; border-bottom: 1px solid #555;">
+                    <div style="width: 45px; height: 45px; background: #4CAF50; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px; color: white; font-size: 18px;">👤</div>
+                    <div style="flex: 1;">
+                        <div style="color: #fff; font-size: 16px; margin-bottom: 3px;">张三</div>
+                        <div style="color: #888; font-size: 12px;">今天 15:30</div>
+                    </div>
+                    <div style="color: #4CAF50; font-size: 20px;">📞</div>
+                </div>
+                <div style="padding: 15px; display: flex; align-items: center; border-bottom: 1px solid #555;">
+                    <div style="width: 45px; height: 45px; background: #2196F3; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px; color: white; font-size: 18px;">👤</div>
+                    <div style="flex: 1;">
+                        <div style="color: #fff; font-size: 16px; margin-bottom: 3px;">李四</div>
+                        <div style="color: #888; font-size: 12px;">昨天 20:15</div>
+                    </div>
+                    <div style="color: #f44336; font-size: 20px;">📞</div>
+                </div>
+                <div style="padding: 15px; display: flex; align-items: center;">
+                    <div style="width: 45px; height: 45px; background: #FF9800; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px; color: white; font-size: 18px;">👤</div>
+                    <div style="flex: 1;">
+                        <div style="color: #fff; font-size: 16px; margin-bottom: 3px;">王五</div>
+                        <div style="color: #888; font-size: 12px;">1月18日 14:20</div>
+                    </div>
+                    <div style="color: #4CAF50; font-size: 20px;">📞</div>
+                </div>
+            </div>
+            
+            <!-- 拨号按钮 -->
+            <div style="text-align: center;">
+                <div style="width: 60px; height: 60px; background: #4CAF50; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; color: white; font-size: 24px; box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);">📞</div>
+                <div style="color: #888; font-size: 14px; margin-top: 8px;">拨号</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="app-content" id="cameraApp">
+        <div class="app-header">
+            <div class="app-title">相机</div>
+            <div class="back-btn" id="backToHome4">←</div>
+        </div>
+        <div style="flex: 1; position: relative; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; flex-direction: column; justify-content: space-between; padding: 20px 0;">
+            <!-- 相机预览区域 -->
+            <div style="flex: 1; display: flex; align-items: center; justify-content: center;">
+                <div style="width: 200px; height: 200px; border: 3px dashed rgba(255,255,255,0.5); border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white;">
+                    <div style="font-size: 48px; margin-bottom: 10px;">📷</div>
+                    <div style="font-size: 16px;">相机预览</div>
+                </div>
+            </div>
+            
+            <!-- 底部控制栏 -->
+            <div style="display: flex; justify-content: space-around; align-items: center; padding: 0 20px;">
+                <div style="width: 45px; height: 45px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; cursor: pointer;">🖼️</div>
+                <div style="width: 70px; height: 70px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">📸</div>
+                <div style="width: 45px; height: 45px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; cursor: pointer;">🔄</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="app-content" id="settingsApp">
+        <div class="app-header">
+            <div class="app-title">设置</div>
+            <div class="back-btn" id="backToHome5">←</div>
+        </div>
+        <div style="flex: 1; overflow-y: auto; padding: 10px 0;">
+            <div style="background: #333; margin-bottom: 15px; border-radius: 15px; overflow: hidden;">
+                <div style="padding: 15px; display: flex; align-items: center; border-bottom: 1px solid #555;">
+                    <div style="width: 40px; height: 40px; background: #4CAF50; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px; color: white; font-size: 18px;">👤</div>
+                    <div style="flex: 1;">
+                        <div style="color: #fff; font-size: 16px; margin-bottom: 3px;">Apple ID</div>
+                        <div style="color: #888; font-size: 14px;">用户账户设置</div>
+                    </div>
+                    <div style="color: #888; font-size: 18px;">›</div>
+                </div>
+            </div>
+            
+            <div style="background: #333; margin-bottom: 15px; border-radius: 15px; overflow: hidden;">
+                <div style="padding: 15px; display: flex; align-items: center; border-bottom: 1px solid #555;">
+                    <div style="width: 40px; height: 40px; background: #2196F3; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-right: 15px; color: white; font-size: 18px;">📶</div>
+                    <div style="flex: 1;">
+                        <div style="color: #fff; font-size: 16px;">蜂窝网络</div>
+                    </div>
+                    <div style="color: #888; font-size: 18px;">›</div>
+                </div>
+                <div style="padding: 15px; display: flex; align-items: center; border-bottom: 1px solid #555;">
+                    <div style="width: 40px; height: 40px; background: #9C27B0; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-right: 15px; color: white; font-size: 18px;">📱</div>
+                    <div style="flex: 1;">
+                        <div style="color: #fff; font-size: 16px;">显示与亮度</div>
+                    </div>
+                    <div style="color: #888; font-size: 18px;">›</div>
+                </div>
+                <div style="padding: 15px; display: flex; align-items: center; border-bottom: 1px solid #555;">
+                    <div style="width: 40px; height: 40px; background: #FF5722; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-right: 15px; color: white; font-size: 18px;">🔊</div>
+                    <div style="flex: 1;">
+                        <div style="color: #fff; font-size: 16px;">声音与触感</div>
+                    </div>
+                    <div style="color: #888; font-size: 18px;">›</div>
+                </div>
+                <div style="padding: 15px; display: flex; align-items: center;">
+                    <div style="width: 40px; height: 40px; background: #607D8B; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-right: 15px; color: white; font-size: 18px;">🔒</div>
+                    <div style="flex: 1;">
+                        <div style="color: #fff; font-size: 16px;">隐私与安全</div>
+                    </div>
+                    <div style="color: #888; font-size: 18px;">›</div>
+                </div>
+            </div>
+            
+            <div style="background: #333; margin-bottom: 15px; border-radius: 15px; overflow: hidden;">
+                <div style="padding: 15px; display: flex; align-items: center;">
+                    <div style="width: 40px; height: 40px; background: #795548; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-right: 15px; color: white; font-size: 18px;">ℹ️</div>
+                    <div style="flex: 1;">
+                        <div style="color: #fff; font-size: 16px;">关于本机</div>
+                    </div>
+                    <div style="color: #888; font-size: 18px;">›</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="app-content" id="galleryApp">
+        <div class="app-header">
+            <div class="app-title">相册</div>
+            <div class="back-btn" id="backToHome6">←</div>
+        </div>
+        <div style="flex: 1; padding: 10px 0;">
+            <!-- 相册统计 -->
+            <div style="text-align: center; margin-bottom: 20px;">
+                <div style="color: #fff; font-size: 24px; margin-bottom: 5px;">126 张照片</div>
+                <div style="color: #888; font-size: 14px;">最近添加于今天</div>
+            </div>
+            
+            <!-- 相册分类 -->
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px;">
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; padding: 20px; text-align: center;">
+                    <div style="font-size: 32px; margin-bottom: 8px;">📸</div>
+                    <div style="color: white; font-size: 16px; font-weight: bold;">最近项目</div>
+                    <div style="color: rgba(255,255,255,0.8); font-size: 12px;">28 张</div>
+                </div>
+                <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 15px; padding: 20px; text-align: center;">
+                    <div style="font-size: 32px; margin-bottom: 8px;">❤️</div>
+                    <div style="color: white; font-size: 16px; font-weight: bold;">个人收藏</div>
+                    <div style="color: rgba(255,255,255,0.8); font-size: 12px;">12 张</div>
+                </div>
+            </div>
+            
+            <!-- 照片网格 -->
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px;">
+                <div style="aspect-ratio: 1; background: linear-gradient(45deg, #ff6b6b, #feca57); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px;">🌅</div>
+                <div style="aspect-ratio: 1; background: linear-gradient(45deg, #48cae4, #023047); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px;">🌊</div>
+                <div style="aspect-ratio: 1; background: linear-gradient(45deg, #54a0ff, #2e86de); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px;">🏔️</div>
+                <div style="aspect-ratio: 1; background: linear-gradient(45deg, #5f27cd, #341f97); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px;">🌙</div>
+                <div style="aspect-ratio: 1; background: linear-gradient(45deg, #00d2d3, #54a0ff); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px;">🌸</div>
+                <div style="aspect-ratio: 1; background: linear-gradient(45deg, #ff9ff3, #f368e0); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px;">🦋</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="app-content" id="musicApp">
+        <div class="app-header">
+            <div class="app-title">音乐</div>
+            <div class="back-btn" id="backToHome7">←</div>
+        </div>
+        <div style="flex: 1; display: flex; flex-direction: column; padding: 20px 0;">
+            <!-- 当前播放 -->
+            <div style="text-align: center; margin-bottom: 30px;">
+                <div style="width: 250px; height: 250px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 25px; margin: 0 auto 20px auto; display: flex; align-items: center; justify-content: center; font-size: 64px; color: white; box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);">🎵</div>
+                <div style="color: #fff; font-size: 20px; font-weight: bold; margin-bottom: 5px;">Relaxing Music</div>
+                <div style="color: #888; font-size: 16px; margin-bottom: 20px;">Unknown Artist</div>
+                
+                <!-- 进度条 -->
+                <div style="margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; color: #888; font-size: 12px; margin-bottom: 8px;">
+                        <span>1:25</span>
+                        <span>3:47</span>
+                    </div>
+                    <div style="height: 4px; background: #333; border-radius: 2px; position: relative;">
+                        <div style="width: 35%; height: 100%; background: linear-gradient(90deg, #667eea, #764ba2); border-radius: 2px;"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 控制按钮 -->
+            <div style="display: flex; justify-content: center; align-items: center; gap: 25px;">
+                <div style="width: 50px; height: 50px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; font-size: 24px;">⏮</div>
+                <div style="width: 70px; height: 70px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 32px; color: white; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);">⏸</div>
+                <div style="width: 50px; height: 50px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; font-size: 24px;">⏭</div>
+            </div>
+            
+            <!-- 底部功能按钮 -->
+            <div style="display: flex; justify-content: space-around; margin-top: auto; padding: 20px 0;">
+                <div style="text-align: center; cursor: pointer;">
+                    <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 5px auto; color: white; font-size: 18px;">🔀</div>
+                    <div style="color: #888; font-size: 10px;">随机</div>
+                </div>
+                <div style="text-align: center; cursor: pointer;">
+                    <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 5px auto; color: white; font-size: 18px;">🔁</div>
+                    <div style="color: #888; font-size: 10px;">循环</div>
+                </div>
+                <div style="text-align: center; cursor: pointer;">
+                    <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 5px auto; color: white; font-size: 18px;">📝</div>
+                    <div style="color: #888; font-size: 10px;">歌词</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="app-content" id="calendarApp">
+        <div class="app-header">
+            <div class="app-title">日历</div>
+            <div class="back-btn" id="backToHome8">←</div>
+        </div>
+        <div style="flex: 1; padding: 15px 0;">
+            <!-- 月份导航 -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding: 0 10px;">
+                <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; font-size: 18px;">‹</div>
+                <div style="text-align: center;">
+                    <div style="color: #fff; font-size: 24px; font-weight: bold;">2025年1月</div>
+                    <div style="color: #888; font-size: 14px;">今天是20日星期一</div>
+                </div>
+                <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; font-size: 18px;">›</div>
+            </div>
+            
+            <!-- 日历网格 -->
+            <div style="background: #333; border-radius: 15px; padding: 15px; margin-bottom: 20px;">
+                <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; text-align: center;">
+                    <!-- 星期标题 -->
+                    <div style="color: #f44336; font-size: 12px; font-weight: bold; padding: 8px;">日</div>
+                    <div style="color: #888; font-size: 12px; font-weight: bold; padding: 8px;">一</div>
+                    <div style="color: #888; font-size: 12px; font-weight: bold; padding: 8px;">二</div>
+                    <div style="color: #888; font-size: 12px; font-weight: bold; padding: 8px;">三</div>
+                    <div style="color: #888; font-size: 12px; font-weight: bold; padding: 8px;">四</div>
+                    <div style="color: #888; font-size: 12px; font-weight: bold; padding: 8px;">五</div>
+                    <div style="color: #2196F3; font-size: 12px; font-weight: bold; padding: 8px;">六</div>
+                    
+                    <!-- 日期 -->
+                    <div style="padding: 12px 8px; font-size: 14px; color: #888;">29</div>
+                    <div style="padding: 12px 8px; font-size: 14px; color: #888;">30</div>
+                    <div style="padding: 12px 8px; font-size: 14px; color: #fff;">1</div>
+                    <div style="padding: 12px 8px; font-size: 14px; color: #fff;">2</div>
+                    <div style="padding: 12px 8px; font-size: 14px; color: #fff;">3</div>
+                    <div style="padding: 12px 8px; font-size: 14px; color: #fff;">4</div>
+                    <div style="padding: 12px 8px; font-size: 14px; color: #fff;">5</div>
+                    <div style="padding: 12px 8px; font-size: 14px; color: #fff;">6</div>
+                    <div style="padding: 12px 8px; font-size: 14px; color: #fff;">7</div>
+                    <div style="padding: 12px 8px; font-size: 14px; color: #fff;">8</div>
+                    <div style="padding: 12px 8px; font-size: 14px; color: #fff;">9</div>
+                    <div style="padding: 12px 8px; font-size: 14px; color: #fff;">10</div>
+                    <div style="padding: 12px 8px; font-size: 14px; color: #fff;">11</div>
+                    <div style="padding: 12px 8px; font-size: 14px; color: #fff;">12</div>
+                    <div style="padding: 12px 8px; font-size: 14px; color: #fff;">13</div>
+                    <div style="padding: 12px 8px; font-size: 14px; color: #fff;">14</div>
+                    <div style="padding: 12px 8px; font-size: 14px; color: #fff; background: #FF5722; border-radius: 50%;">15</div>
+                    <div style="padding: 12px 8px; font-size: 14px; color: #fff;">16</div>
+                    <div style="padding: 12px 8px; font-size: 14px; color: #fff;">17</div>
+                    <div style="padding: 12px 8px; font-size: 14px; color: #fff;">18</div>
+                    <div style="padding: 12px 8px; font-size: 14px; color: #fff;">19</div>
+                    <div style="padding: 12px 8px; font-size: 14px; color: #000; background: #4CAF50; border-radius: 50%; font-weight: bold;">20</div>
+                    <div style="padding: 12px 8px; font-size: 14px; color: #fff;">21</div>
+                    <div style="padding: 12px 8px; font-size: 14px; color: #fff;">22</div>
+                    <div style="padding: 12px 8px; font-size: 14px; color: #fff;">23</div>
+                    <div style="padding: 12px 8px; font-size: 14px; color: #fff;">24</div>
+                    <div style="padding: 12px 8px; font-size: 14px; color: #fff;">25</div>
+                    <div style="padding: 12px 8px; font-size: 14px; color: #fff;">26</div>
+                </div>
+            </div>
+            
+            <!-- 今日事件 -->
+            <div style="background: #333; border-radius: 15px; padding: 15px;">
+                <div style="color: #fff; font-size: 16px; font-weight: bold; margin-bottom: 15px;">今日事件</div>
+                <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                    <div style="width: 8px; height: 8px; background: #4CAF50; border-radius: 50%; margin-right: 12px;"></div>
+                    <div style="flex: 1;">
+                        <div style="color: #fff; font-size: 14px;">工作会议</div>
+                        <div style="color: #888; font-size: 12px;">09:00 - 10:30</div>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center;">
+                    <div style="width: 8px; height: 8px; background: #2196F3; border-radius: 50%; margin-right: 12px;"></div>
+                    <div style="flex: 1;">
+                        <div style="color: #fff; font-size: 14px;">午餐约会</div>
+                        <div style="color: #888; font-size: 12px;">12:00 - 13:30</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="app-content" id="clockApp">
+        <div class="app-header">
+            <div class="app-title">时钟</div>
+            <div class="back-btn" id="backToHome9">←</div>
+        </div>
+        <div style="flex: 1; display: flex; flex-direction: column; padding: 20px 0;">
+            <!-- 主时钟 -->
+            <div style="text-align: center; margin-bottom: 30px;">
+                <div style="width: 280px; height: 280px; border: 6px solid #333; border-radius: 50%; position: relative; margin: 0 auto 20px auto; background: radial-gradient(circle, #1a1a1a 0%, #000 100%); display: flex; align-items: center; justify-content: center; box-shadow: inset 0 0 50px rgba(0,0,0,0.5), 0 0 50px rgba(102, 126, 234, 0.2);">
+                    <!-- 时钟刻度 -->
+                    <div style="position: absolute; width: 100%; height: 100%;">
+                        <div style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 2px; height: 20px; background: #666;"></div>
+                        <div style="position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); width: 2px; height: 20px; background: #666;"></div>
+                        <div style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 20px; height: 2px; background: #666;"></div>
+                        <div style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); width: 20px; height: 2px; background: #666;"></div>
+                    </div>
+                    <!-- 数字时间 -->
+                    <div style="color: #fff; font-size: 48px; font-weight: bold; font-family: 'Courier New', monospace;" id="currentTime">12:00</div>
+                    <!-- 中心点 -->
+                    <div style="position: absolute; width: 12px; height: 12px; background: #4CAF50; border-radius: 50%; top: 50%; left: 50%; transform: translate(-50%, -50%);"></div>
+                </div>
+                <div style="color: #888; font-size: 18px; margin-bottom: 5px;">北京时间</div>
+                <div style="color: #666; font-size: 14px;" id="currentDate">2025年1月20日 星期一</div>
+            </div>
+            
+            <!-- 世界时钟 -->
+            <div style="background: #333; border-radius: 15px; padding: 15px; margin-bottom: 20px;">
+                <div style="color: #fff; font-size: 16px; font-weight: bold; margin-bottom: 15px;">世界时钟</div>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                    <div style="text-align: center; padding: 15px; background: #444; border-radius: 10px;">
+                        <div style="color: #888; font-size: 12px; margin-bottom: 5px;">纽约</div>
+                        <div style="color: #fff; font-size: 18px; font-weight: bold;">23:00</div>
+                        <div style="color: #666; font-size: 10px;">-13小时</div>
+                    </div>
+                    <div style="text-align: center; padding: 15px; background: #444; border-radius: 10px;">
+                        <div style="color: #888; font-size: 12px; margin-bottom: 5px;">伦敦</div>
+                        <div style="color: #fff; font-size: 18px; font-weight: bold;">04:00</div>
+                        <div style="color: #666; font-size: 10px;">-8小时</div>
+                    </div>
+                    <div style="text-align: center; padding: 15px; background: #444; border-radius: 10px;">
+                        <div style="color: #888; font-size: 12px; margin-bottom: 5px;">东京</div>
+                        <div style="color: #fff; font-size: 18px; font-weight: bold;">13:00</div>
+                        <div style="color: #666; font-size: 10px;">+1小时</div>
+                    </div>
+                    <div style="text-align: center; padding: 15px; background: #444; border-radius: 10px;">
+                        <div style="color: #888; font-size: 12px; margin-bottom: 5px;">悉尼</div>
+                        <div style="color: #fff; font-size: 18px; font-weight: bold;">15:00</div>
+                        <div style="color: #666; font-size: 10px;">+3小时</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 闹钟 -->
+            <div style="background: #333; border-radius: 15px; padding: 15px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <div style="color: #fff; font-size: 16px; font-weight: bold;">闹钟</div>
+                    <div style="color: #4CAF50; font-size: 24px; cursor: pointer;">+</div>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #555;">
+                    <div>
+                        <div style="color: #fff; font-size: 18px; font-weight: bold;">07:30</div>
+                        <div style="color: #888; font-size: 12px;">工作日</div>
+                    </div>
+                    <div style="width: 40px; height: 24px; background: #4CAF50; border-radius: 12px; position: relative; cursor: pointer;">
+                        <div style="width: 20px; height: 20px; background: white; border-radius: 50%; position: absolute; top: 2px; right: 2px;"></div>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0;">
+                    <div>
+                        <div style="color: #666; font-size: 18px;">09:00</div>
+                        <div style="color: #555; font-size: 12px;">周末</div>
+                    </div>
+                    <div style="width: 40px; height: 24px; background: #555; border-radius: 12px; position: relative; cursor: pointer;">
+                        <div style="width: 20px; height: 20px; background: white; border-radius: 50%; position: absolute; top: 2px; left: 2px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+            </div>
+        </div>
+                <!-- 手机键盘 - 完整版本 -->
+                <div id="phoneKeyboard" style="
+                    position: absolute; 
+                    bottom: 12px; 
+                    left: 12px; 
+                    right: 12px; 
+                    height: 240px; 
+                    background: rgba(40, 40, 40, 0.95); 
+                    border-radius: 15px 15px 0 0; 
+                    z-index: 1000; 
+                    display: none; 
+                    flex-direction: column; 
+                    padding: 12px 8px 8px 8px;
+                    box-sizing: border-box;
+                    backdrop-filter: blur(20px);
+                    box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
+                    border-top: 1px solid rgba(255,255,255,0.1);
+                    max-width: 404px;
+                ">
+                    <!-- 键盘指示器 -->
+                    <div style="width: 40px; height: 4px; background: rgba(255,255,255,0.3); border-radius: 2px; margin: 0 auto 12px auto;"></div>
+                    
+                    <!-- 第一行：QWERTYUIOP -->
+                    <div class="mobile-key-row">
+                        <div class="mobile-key" data-key="q">Q</div>
+                        <div class="mobile-key" data-key="w">W</div>
+                        <div class="mobile-key" data-key="e">E</div>
+                        <div class="mobile-key" data-key="r">R</div>
+                        <div class="mobile-key" data-key="t">T</div>
+                        <div class="mobile-key" data-key="y">Y</div>
+                        <div class="mobile-key" data-key="u">U</div>
+                        <div class="mobile-key" data-key="i">I</div>
+                        <div class="mobile-key" data-key="o">O</div>
+                        <div class="mobile-key" data-key="p">P</div>
+                    </div>
+                    
+                    <!-- 第二行：ASDFGHJKL -->
+                    <div class="mobile-key-row">
+                        <div class="mobile-key" data-key="a">A</div>
+                        <div class="mobile-key" data-key="s">S</div>
+                        <div class="mobile-key" data-key="d">D</div>
+                        <div class="mobile-key" data-key="f">F</div>
+                        <div class="mobile-key" data-key="g">G</div>
+                        <div class="mobile-key" data-key="h">H</div>
+                        <div class="mobile-key" data-key="j">J</div>
+                        <div class="mobile-key" data-key="k">K</div>
+                        <div class="mobile-key" data-key="l">L</div>
+                    </div>
+                    
+                    <!-- 第三行：ZXCVBNM + 退格 -->
+                    <div class="mobile-key-row">
+                        <div class="mobile-key" data-key="z">Z</div>
+                        <div class="mobile-key" data-key="x">X</div>
+                        <div class="mobile-key" data-key="c">C</div>
+                        <div class="mobile-key" data-key="v">V</div>
+                        <div class="mobile-key" data-key="b">B</div>
+                        <div class="mobile-key" data-key="n">N</div>
+                        <div class="mobile-key" data-key="m">M</div>
+                        <div class="mobile-key mobile-key-special" data-key="backspace">⌫</div>
+                    </div>
+                    
+                    <!-- 第四行：数字/符号/空格/回车 -->
+                    <div class="mobile-key-row">
+                        <div class="mobile-key mobile-key-function" data-key="123">123</div>
+                        <div class="mobile-key" data-key=",">，</div>
+                        <div class="mobile-key mobile-key-space" data-key="space">空格</div>
+                        <div class="mobile-key" data-key=".">。</div>
+                        <div class="mobile-key mobile-key-special" data-key="enter">↵</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="phone-bottom" style="width: 200px; height: 20px; background-color: #222; border-radius: 20px; margin-top: 20px;"></div>
+    </div>
+    </div>
 
     <script>
+        // Firebase配置
+        const firebaseConfig = {
+            apiKey: "AIzaSyA5Z5ieEbAcfQX0kxGSn9ldGXhzvAwx_8M",
+            authDomain: "chat-294cc.firebaseapp.com",
+            databaseURL: "https://chat-294cc-default-rtdb.firebaseio.com",
+            projectId: "chat-294cc",
+            storageBucket: "chat-294cc.firebasestorage.app",
+            messagingSenderId: "913615304269",
+            appId: "1:913615304269:web:0274ffaccb8e6b678e4e04",
+            measurementId: "G-SJR9NDW86B"
+        };
+
+        // 初始化Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const messagesRef = database.ref('messages');
+
+        // 生成用户ID（简单的随机ID）
+        let userId = localStorage.getItem('userId');
+        if (!userId) {
+            userId = 'user_' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('userId', userId);
+        }
+
+        // 用户颜色（用于区分不同用户）
+        const userColors = ['#4CAF50', '#2196F3', '#FF9800', '#9C27B0', '#F44336', '#00BCD4'];
+        let userColor = localStorage.getItem('userColor');
+        if (!userColor) {
+            userColor = userColors[Math.floor(Math.random() * userColors.length)];
+            localStorage.setItem('userColor', userColor);
+        }
+
         $(document).ready(function() {
+            // 初始化完成
+            console.log('手机模拟器加载完成');
+            
+            // 初始化消息监听
+            initializeChat();
+
             // 应用图标点击事件
             $('.app-icon').click(function() {
                 const appName = $(this).data('app');
+                // 隐藏主屏幕和dock
+                $('#appGrid').hide();
+                $('.dock').hide();
                 // 隐藏所有应用内容
                 $('.app-content').hide();
                 // 显示对应应用
@@ -516,64 +1168,123 @@
             });
             
             // 返回主页按钮
-            $('#backToHome, #backToHome2').click(function() {
+            $('#backToHome, #backToHome2, #backToHome3, #backToHome4, #backToHome5, #backToHome6, #backToHome7, #backToHome8, #backToHome9').click(function() {
                 $('.app-content').hide();
                 $('#appGrid').show();
+                $('.dock').show();
+                hideMobileKeyboard();
             });
             
             // 聊天输入框点击显示键盘
             $('#chatInput').click(function() {
-                $('.keyboard').show();
+                console.log('输入框被点击，显示键盘');
+                showMobileKeyboard();
             });
             
-            // 键盘按键点击事件
-            $('.key').not('#spaceKey, #enterKey').click(function() {
-                const text = $(this).text();
-                $('#chatInput').val($('#chatInput').val() + text);
+            // 调试按钮 - 强制显示键盘
+            $('#debugKeyboard').click(function() {
+                console.log('调试按钮被点击，强制显示键盘');
+                if ($('#phoneKeyboard').is(':visible')) {
+                    hideMobileKeyboard();
+                } else {
+                    showMobileKeyboard();
+                }
             });
             
-            // 空格键
-            $('#spaceKey').click(function() {
-                $('#chatInput').val($('#chatInput').val() + ' ');
+            // 增强输入框体验
+            $('#chatInput').focus(function() {
+                showMobileKeyboard();
             });
             
-            // 回车键（发送消息）
-            $('#enterKey').click(function() {
-                sendChatMessage();
+            // 显示手机键盘
+            function showMobileKeyboard() {
+                $('#phoneKeyboard').css('display', 'flex').addClass('show');
+                $('.chat-input').css('bottom', '250px');
+                // 调整消息区域高度
+                $('.chat-messages').css('max-height', 'calc(100% - 380px)');
+                // 滚动到最新消息
+                setTimeout(() => {
+                    const messages = $('#chatMessages');
+                    messages.animate({
+                        scrollTop: messages[0].scrollHeight
+                    }, 300);
+                }, 100);
+                console.log('手机键盘已显示');
+            }
+            
+            // 隐藏手机键盘
+            function hideMobileKeyboard() {
+                $('#phoneKeyboard').hide();
+                $('.chat-input').css('bottom', '12px');
+                // 恢复消息区域高度
+                $('.chat-messages').css('max-height', 'calc(100% - 140px)');
+                console.log('手机键盘已隐藏');
+            }
+            
+            // 手机键盘按键事件
+            $(document).on('click', '.mobile-key', function() {
+                const $key = $(this);
+                const keyValue = $key.data('key');
+                const input = $('#chatInput');
+                
+                console.log('手机键盘按键被点击:', keyValue);
+                
+                // 添加按下效果
+                $key.addClass('pressed');
+                setTimeout(() => {
+                    $key.removeClass('pressed');
+                }, 150);
+                
+                // 振动反馈
+                if (navigator.vibrate) {
+                    navigator.vibrate(30);
+                }
+                
+                // 处理按键
+                switch(keyValue) {
+                    case 'backspace':
+                        const currentValue = input.val();
+                        if (currentValue.length > 0) {
+                            input.val(currentValue.slice(0, -1));
+                        }
+                        break;
+                    case 'space':
+                        input.val(input.val() + ' ');
+                        break;
+                    case 'enter':
+                        sendChatMessage();
+                        break;
+                    case '123':
+                        // 数字模式切换（暂时忽略）
+                        break;
+                    case ',':
+                    case '.':
+                        input.val(input.val() + $key.text());
+                        break;
+                    default:
+                        if (keyValue && keyValue.length === 1 && /[a-zA-Z]/.test(keyValue)) {
+                            input.val(input.val() + keyValue.toLowerCase());
+                        }
+                        break;
+                }
+                
+                // 保持输入框焦点
+                input.focus();
             });
+            
+
+            
+
             
             // 发送消息按钮
             $('#sendMessage').click(function() {
                 sendChatMessage();
             });
             
-            // 发送消息函数
-            function sendChatMessage() {
-                const input = $('#chatInput');
-                const message = input.val().trim();
-                if (message) {
-                    const now = new Date();
-                    const h = now.getHours().toString().padStart(2, '0');
-                    const m = now.getMinutes().toString().padStart(2, '0');
-                    
-                    const messages = $('#chatMessages');
-                    messages.append(`
-                        <div class="message user">
-                            <div class="message-time">${h}:${m}</div>
-                            <div>${message}</div>
-                        </div>
-                    `);
-                    
-                    input.val('');
-                    messages.scrollTop(messages[0].scrollHeight);
-                    $('.keyboard').hide();
-                }
-            }
-            
             // 点击屏幕其他地方隐藏键盘
             $(document).click(function(event) {
-                if (!$(event.target).closest('.input-box, .keyboard, .send-btn').length) {
-                    $('.keyboard').hide();
+                if (!$(event.target).closest('.input-box, #phoneKeyboard, .send-btn').length) {
+                    hideMobileKeyboard();
                 }
             });
             
@@ -581,12 +1292,14 @@
             $('#lockScreen').click(function() {
                 $('#lockScreen').fadeOut(500, function() {
                     $('#appGrid').show();
+                    $('.dock').show();
                 });
             });
             
             // 初始显示锁屏
             $('#lockScreen').show();
             $('#appGrid').hide();
+            $('.dock').hide();
             
             // 实时更新时间
             function updateLockTime() {
@@ -594,8 +1307,116 @@
                 const h = now.getHours().toString().padStart(2, '0');
                 const m = now.getMinutes().toString().padStart(2, '0');
                 $('#lockTime').text(`${h}:${m}`);
+                $('#currentTime').text(`${h}:${m}`);
+                
+                // 更新日期
+                const year = now.getFullYear();
+                const month = now.getMonth() + 1;
+                const day = now.getDate();
+                const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+                const weekday = weekdays[now.getDay()];
+                $('#currentDate').text(`${year}年${month}月${day}日 ${weekday}`);
+                
+                // 状态栏时间已移除
             }
+            
+            // 每秒更新时间
+            setInterval(updateLockTime, 1000);
+            updateLockTime();
         });
+
+        // 初始化聊天功能
+        function initializeChat() {
+            // 添加一些示例消息用于展示滚动功能
+            const sampleMessages = [
+                { text: "欢迎使用Trump Mobile聊天应用！", userId: "system", userName: "系统", userColor: "#2196F3", time: "09:00" },
+                { text: "这是一个功能完整的聊天界面", userId: "friend1", userName: "朋友1", userColor: "#4CAF50", time: "09:01" },
+                { text: "支持实时消息同步", userId: "friend2", userName: "朋友2", userColor: "#FF9800", time: "09:02" },
+                { text: "你好！很高兴见到你", userId: userId, userName: "我", userColor: userColor, time: "09:03" },
+                { text: "这个聊天应用界面很棒！", userId: "friend1", userName: "朋友1", userColor: "#4CAF50", time: "09:04" },
+                { text: "是的，而且还有虚拟键盘", userId: "friend2", userName: "朋友2", userColor: "#FF9800", time: "09:05" },
+                { text: "可以试试滚动查看更多消息", userId: "friend1", userName: "朋友1", userColor: "#4CAF50", time: "09:06" },
+                { text: "键盘功能也很流畅", userId: userId, userName: "我", userColor: userColor, time: "09:07" },
+                { text: "这是另一条测试消息", userId: "friend2", userName: "朋友2", userColor: "#FF9800", time: "09:08" },
+                { text: "聊天界面支持滚动浏览", userId: "friend1", userName: "朋友1", userColor: "#4CAF50", time: "09:09" },
+                { text: "很棒的用户体验！", userId: userId, userName: "我", userColor: userColor, time: "09:10" },
+                { text: "继续添加更多消息来测试滚动", userId: "friend2", userName: "朋友2", userColor: "#FF9800", time: "09:11" },
+                { text: "可以看到消息历史记录", userId: "friend1", userName: "朋友1", userColor: "#4CAF50", time: "09:12" },
+                { text: "滚动条样式也很美观", userId: userId, userName: "我", userColor: userColor, time: "09:13" },
+                { text: "这是最后一条示例消息", userId: "friend2", userName: "朋友2", userColor: "#FF9800", time: "09:14" }
+            ];
+            
+            // 显示示例消息
+            sampleMessages.forEach(messageData => {
+                displayMessage(messageData);
+            });
+            
+            // 监听新消息
+            messagesRef.limitToLast(50).on('child_added', function(snapshot) {
+                const messageData = snapshot.val();
+                // 避免重复显示示例消息
+                if (messageData && messageData.timestamp) {
+                    displayMessage(messageData);
+                }
+            });
+        }
+
+        // 显示消息
+        function displayMessage(messageData) {
+            const messages = $('#chatMessages');
+            const isCurrentUser = messageData.userId === userId;
+            const messageClass = isCurrentUser ? 'user' : 'friend';
+            const backgroundColor = isCurrentUser ? '#4CAF50' : messageData.userColor || '#555';
+            
+            const messageElement = `
+                <div style="clear: both; margin-bottom: 5px;">
+                    <div class="message ${messageClass}" style="background-color: ${backgroundColor};">
+                        <div class="message-time">${messageData.time}</div>
+                        ${!isCurrentUser ? `<div class="message-user">${messageData.userName}</div>` : ''}
+                        <div>${messageData.text}</div>
+                    </div>
+                </div>
+            `;
+            
+            messages.append(messageElement);
+            
+            // 平滑滚动到底部
+            setTimeout(() => {
+                messages.animate({
+                    scrollTop: messages[0].scrollHeight
+                }, 300);
+            }, 50);
+        }
+
+        // 发送消息函数
+        function sendChatMessage() {
+            const input = $('#chatInput');
+            const message = input.val().trim();
+            if (message) {
+                const now = new Date();
+                const h = now.getHours().toString().padStart(2, '0');
+                const m = now.getMinutes().toString().padStart(2, '0');
+                
+                // 创建消息对象
+                const messageData = {
+                    text: message,
+                    userId: userId,
+                    userName: `用户${userId.slice(-4)}`, // 使用用户ID后4位作为显示名
+                    userColor: userColor,
+                    time: `${h}:${m}`,
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                };
+                
+                // 发送到Firebase
+                messagesRef.push(messageData).then(() => {
+                    input.val('');
+                    hideMobileKeyboard();
+                }).catch((error) => {
+                    console.error('发送消息失败:', error);
+                    alert('发送消息失败，请检查网络连接');
+                });
+            }
+        }
     </script>
 </body>
 </html>
