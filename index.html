@@ -1331,21 +1331,21 @@
         function initializeChat() {
             // 添加一些示例消息用于展示滚动功能
             const sampleMessages = [
-                { text: "欢迎使用Trump Mobile聊天应用！", userId: "system", userName: "系统", userColor: "#2196F3", time: "09:00" },
-                { text: "这是一个功能完整的聊天界面", userId: "friend1", userName: "朋友1", userColor: "#4CAF50", time: "09:01" },
-                { text: "支持实时消息同步", userId: "friend2", userName: "朋友2", userColor: "#FF9800", time: "09:02" },
-                { text: "你好！很高兴见到你", userId: userId, userName: "我", userColor: userColor, time: "09:03" },
-                { text: "这个聊天应用界面很棒！", userId: "friend1", userName: "朋友1", userColor: "#4CAF50", time: "09:04" },
-                { text: "是的，而且还有虚拟键盘", userId: "friend2", userName: "朋友2", userColor: "#FF9800", time: "09:05" },
-                { text: "可以试试滚动查看更多消息", userId: "friend1", userName: "朋友1", userColor: "#4CAF50", time: "09:06" },
-                { text: "键盘功能也很流畅", userId: userId, userName: "我", userColor: userColor, time: "09:07" },
-                { text: "这是另一条测试消息", userId: "friend2", userName: "朋友2", userColor: "#FF9800", time: "09:08" },
-                { text: "聊天界面支持滚动浏览", userId: "friend1", userName: "朋友1", userColor: "#4CAF50", time: "09:09" },
-                { text: "很棒的用户体验！", userId: userId, userName: "我", userColor: userColor, time: "09:10" },
-                { text: "继续添加更多消息来测试滚动", userId: "friend2", userName: "朋友2", userColor: "#FF9800", time: "09:11" },
-                { text: "可以看到消息历史记录", userId: "friend1", userName: "朋友1", userColor: "#4CAF50", time: "09:12" },
-                { text: "滚动条样式也很美观", userId: userId, userName: "我", userColor: userColor, time: "09:13" },
-                { text: "这是最后一条示例消息", userId: "friend2", userName: "朋友2", userColor: "#FF9800", time: "09:14" }
+                { text: "Welcome to Trump Mobile Chat!", userId: "system", userName: "System", userColor: "#2196F3", time: "09:00" },
+                { text: "This is a fully functional chat interface", userId: "friend1", userName: "Friend 1", userColor: "#4CAF50", time: "09:01" },
+                { text: "Supports real-time message sync", userId: "friend2", userName: "Friend 2", userColor: "#FF9800", time: "09:02" },
+                { text: "Hello! Nice to meet you", userId: userId, userName: "Me", userColor: userColor, time: "09:03" },
+                { text: "This chat UI is awesome!", userId: "friend1", userName: "Friend 1", userColor: "#4CAF50", time: "09:04" },
+                { text: "Yes, and it even has a virtual keyboard", userId: "friend2", userName: "Friend 2", userColor: "#FF9800", time: "09:05" },
+                { text: "Try scrolling to see more messages", userId: "friend1", userName: "Friend 1", userColor: "#4CAF50", time: "09:06" },
+                { text: "The keyboard works smoothly too", userId: userId, userName: "Me", userColor: userColor, time: "09:07" },
+                { text: "Here is another test message", userId: "friend2", userName: "Friend 2", userColor: "#FF9800", time: "09:08" },
+                { text: "Chat supports scrolling", userId: "friend1", userName: "Friend 1", userColor: "#4CAF50", time: "09:09" },
+                { text: "Great user experience!", userId: userId, userName: "Me", userColor: userColor, time: "09:10" },
+                { text: "Add more messages to test scrolling", userId: "friend2", userName: "Friend 2", userColor: "#FF9800", time: "09:11" },
+                { text: "You can see message history", userId: "friend1", userName: "Friend 1", userColor: "#4CAF50", time: "09:12" },
+                { text: "Scrollbar style is beautiful too", userId: userId, userName: "Me", userColor: userColor, time: "09:13" },
+                { text: "This is the last sample message", userId: "friend2", userName: "Friend 2", userColor: "#FF9800", time: "09:14" }
             ];
             
             // 显示示例消息
@@ -1403,7 +1403,7 @@
                 const messageData = {
                     text: message,
                     userId: userId,
-                    userName: `用户${userId.slice(-4)}`, // 使用用户ID后4位作为显示名
+                    userName: `User${userId.slice(-4)}`,
                     userColor: userColor,
                     time: `${h}:${m}`,
                     timestamp: firebase.database.ServerValue.TIMESTAMP
@@ -1414,7 +1414,8 @@
                     input.val('');
                     hideMobileKeyboard();
                 }).catch((error) => {
-            
+                    console.error('发送消息失败:', error);
+                    alert('发送消息失败，请检查网络连接');
                 });
             }
         }
